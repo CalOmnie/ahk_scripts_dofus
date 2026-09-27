@@ -4,6 +4,17 @@
 #Include utils.ahk
 #Include ocr_utils.ahk
 
+; ==============================================================================
+; Valeurs calibrées pour VOTRE résolution d'écran et taille de fenêtre Dofus.
+; Ne les modifiez pas à la main : appuyez sur Ctrl+Maj+R (assistant de
+; calibration, voir ocr_utils.ahk et le README) et copiez les 3 lignes
+; affichées à la fin ici.
+ingredientStepPx := 45
+searchAreaOffset := {x: -453, y: 57, w: 805, h: 225}
+priceAreaPadding := {x: -11, y: -14, w: 153, h: 72}
+; ==============================================================================
+
+
 ;; CONFIGURATION
 
 recipePriceShortcut := "^p"
@@ -14,16 +25,6 @@ priceAccumulateDebugShortcut := "^+u"
 ocrOptions := {grayscale: true, scale: 3, lang: "fr"}
 ingredientMoveDelayMs := 150
 debugHighlightDelayMs := 500
-
-; ==============================================================================
-; Valeurs calibrées pour VOTRE résolution d'écran et taille de fenêtre Dofus.
-; Ne les modifiez pas à la main : appuyez sur Ctrl+Maj+R (assistant de
-; calibration, voir ocr_utils.ahk et le README) et copiez les 3 lignes
-; affichées à la fin ici.
-ingredientStepPx := 45
-searchAreaOffset := {x: -453, y: 57, w: 805, h: 225}
-priceAreaPadding := {x: -11, y: -14, w: 153, h: 72}
-; ==============================================================================
 
 ;; IMPLEMENTATION
 

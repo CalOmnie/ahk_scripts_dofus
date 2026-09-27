@@ -38,16 +38,6 @@ Plusieurs de ces scripts automatisent des actions dans le jeu (lecture des fenê
 - Tapez `shell:startup`
 - Collez le raccourci dans le dossier
 
-<a id="organisation-des-scripts"></a>
-## Organisation des scripts
-
-Chaque script suit la même structure :
-- `;; CONFIGURATION` : les raccourcis clavier et les réglages modifiables, en haut du fichier — c'est ici qu'il faut changer une touche ou ajouter une entrée (lieu nommé, personnage, etc.)
-- `;; IMPLEMENTATION` : la logique du script
-- `;; UTILITIES` : fonctions utilitaires propres au script
-
-Tous les raccourcis ne fonctionnent que lorsqu'une fenêtre Dofus est au premier plan. `utils.ahk` (voir plus bas) regroupe les fonctions partagées par les autres scripts, notamment cette vérification.
-
 <a id="personnaliser-les-raccourcis"></a>
 ## Personnaliser les raccourcis
 
