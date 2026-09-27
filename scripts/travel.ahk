@@ -13,7 +13,10 @@ clipboardShortcut := "^+v" ; same as broadcastClipboardShortcut, but only sends 
 ; "shortcut" is optional: leave it "" to skip creating a dedicated hotkey
 ; that travels straight there, e.g. "bank" -> travel to 10,22 via Ctrl+Shift+B
 namedLocations := Map(
-    "dim", {coords: [-22, -24], shortcut: "^F1"}
+    "bank", {coords: [-31, -57], shortcut: "^F1"},
+    "kano", {coords: [0, 0], shortcut: "^F2"},
+    "enclo", {coords: [-18, 0], shortcut: "^F3"},
+    "dim", {coords: [-22, -24], shortcut: "^F4"},
 )
 
 ;; IMPLEMENTATION
