@@ -1,4 +1,5 @@
 #Requires AutoHotkey v2.0
+#SingleInstance Force
 #Include utils.ahk
 
 ;; CONFIGURATION
@@ -7,9 +8,9 @@ groupInviteShortcut := "^g"
 
 ;; IMPLEMENTATION
 
-#HotIf WinActive("ahk_exe Dofus.exe")
+HotIf(IsDofusActive)
 Hotkey(groupInviteShortcut, GroupInviteAll)
-#HotIf
+HotIf()
 
 GroupInviteAll(*)
 {
@@ -33,15 +34,4 @@ GroupInviteAll(*)
 
     A_Clipboard := result
     SendChatCommand()
-}
-
-;; UTILITIES
-
-; Window titles look like "$CHAR_NAME - $CHAR_CLASS - $GAME_VERSION - $GAMETYPE"
-ExtractCharName(title)
-{
-    parts := StrSplit(title, " - ")
-    if parts.Length = 0
-        return ""
-    return Trim(parts[1])
 }
