@@ -1,23 +1,36 @@
-#Requires AutoHotkey v2
+#Requires AutoHotkey v2.0
 #SingleInstance Force
 #Include <OCR>
 
-#Requires AutoHotkey v2.0
+;; CONFIGURATION
+
+recipePriceShortcut := "^p"
+recipePriceDebugShortcut := "^+p"
+priceAccumulateShortcut := "^u"
+priceAccumulateDebugShortcut := "^+u"
+
+;; IMPLEMENTATION
+
 #HotIf WinActive("ahk_exe Dofus.exe")
+Hotkey(recipePriceShortcut, RecipePriceHandler)
+Hotkey(recipePriceDebugShortcut, RecipePriceDebugHandler)
+Hotkey(priceAccumulateShortcut, PriceAccumulateHandler)
+Hotkey(priceAccumulateDebugShortcut, PriceAccumulateDebugHandler)
+#HotIf
 
 prices := []
 
-^p::
+RecipePriceHandler(*)
 {
     RecipeTotalPrice()
 }
 
-^+p::
+RecipePriceDebugHandler(*)
 {
     RecipeTotalPrice(true)
 }
 
-^u::
+PriceAccumulateHandler(*)
 {
     global prices
     num := FindPriceNew(false)
@@ -33,7 +46,7 @@ prices := []
         prices.Push(num)
 }
 
-^+u::
+PriceAccumulateDebugHandler(*)
 {
     FindPriceNew(true)
 }
@@ -66,6 +79,7 @@ RecipeTotalPrice(debug := false)
     MsgBox FormatThousands(full_price)
 }
 
+;; UTILITIES
 
 ParseMaxPrice(ocr_res, debug := false) {
     res := -1

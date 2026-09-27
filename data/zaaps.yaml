@@ -1,0 +1,179 @@
+# Zaap list (Amaknean Continent), excluding Incarnam
+# Source: https://dofuswiki.fandom.com/wiki/Zaap
+zaaps:
+  - area: Amakna
+    subarea: Amakna Castle
+    x: 3
+    y: -5
+  - area: Amakna
+    subarea: Amakna Village
+    x: -2
+    y: 0
+  - area: Amakna
+    subarea: Crackler Mountain
+    x: -5
+    y: -8
+  - area: Amakna
+    subarea: Edge of the Evil Forest
+    x: -1
+    y: 13
+  - area: Amakna
+    subarea: Gobball Corner
+    x: 5
+    y: 7
+  - area: Amakna
+    subarea: Madrestam Harbour
+    x: 7
+    y: -4
+  - area: Amakna
+    subarea: Scaraleaf Plain
+    x: -1
+    y: 24
+  - area: Archipelago of Scales
+    subarea: Crocuzko
+    x: -83
+    y: -15
+  - area: Archipelago of Valonia
+    subarea: Snowbound Timberland
+    x: 39
+    y: -82
+  - area: Astrub
+    subarea: Astrub City
+    x: 5
+    y: -18
+  - area: Bonta
+    subarea: City Centre
+    x: -32
+    y: -56
+  - area: Brakmar
+    subarea: City Centre
+    x: -26
+    y: 35
+  - area: Cania Plains
+    subarea: Cania Lake
+    x: -3
+    y: -42
+  - area: Cania Plains
+    subarea: Cania Massif
+    x: -13
+    y: -28
+  - area: Cania Plains
+    subarea: Imp Village
+    x: -16
+    y: -24
+  - area: Cania Plains
+    subarea: Kanig Village
+    x: 0
+    y: -56
+  - area: Cania Plains
+    subarea: Lousy Pig Plain
+    x: -5
+    y: -23
+  - area: Cania Plains
+    subarea: Rocky Plains
+    x: -17
+    y: -47
+  - area: Cania Plains
+    subarea: Rocky Roads
+    x: -20
+    y: -20
+  - area: Cania Plains
+    subarea: The Cania Fields
+    x: -27
+    y: -36
+  - area: Depths of Astrub
+    subarea: Arch of Vili
+    x: 15
+    y: -20
+  - area: Dopple Territory
+    subarea: Dopple Village
+    x: -34
+    y: -8
+  - area: Frigost Island
+    subarea: Entrance to Harebourg's Castle
+    x: -67
+    y: -75
+  - area: Frigost Island
+    subarea: Frigost Village
+    x: -78
+    y: -41
+  - area: Frigost Island
+    subarea: Snowbound Village
+    x: -77
+    y: -73
+  - area: Koalak Mountain
+    subarea: Breeder Village
+    x: -16
+    y: 1
+  - area: Koalak Mountain
+    subarea: Primitive Cemetery
+    x: -12
+    y: 19
+  - area: Moon Island
+    subarea: Turtle Beach
+    x: 35
+    y: 12
+  - area: Nimaltopia
+    subarea: null
+    x: -67
+    y: 29
+  - area: Nolifis Island
+    subarea: Mount Tombs
+    x: 40
+    y: -44
+  - area: Ohwymi
+    subarea: Dunes of Bones
+    x: 15
+    y: -58
+  - area: Otomai Island
+    subarea: Canopy Village
+    x: -54
+    y: 16
+  - area: Otomai Island
+    subarea: Coastal Village
+    x: -46
+    y: 18
+  - area: Pandala Island
+    subarea: Pandala Village
+    x: 20
+    y: -29
+  - area: Sidimote Moors
+    subarea: Caravan Alley
+    x: -25
+    y: 12
+  - area: Sidimote Moors
+    subarea: Desecrated Highlands
+    x: -15
+    y: 25
+  - area: Sufokia Bay
+    subarea: Alliance Temple
+    x: 13
+    y: 35
+  - area: Sufokia Bay
+    subarea: Sufokia
+    x: 13
+    y: 26
+  - area: Sufokia Bay
+    subarea: Sufokian Shoreline
+    x: 10
+    y: 22
+  - area: Tainela
+    subarea: The Cradle
+    x: 1
+    y: -32
+  - area: Trool Fair
+    subarea: null
+    x: -11
+    y: -36
+  - area: Wabbit Islands
+    subarea: Abandoned Labowatowies
+    x: 27
+    y: -14
+  - area: Wabbit Islands
+    subarea: Cawwot Island
+    x: 25
+    y: -4
+  - area: The Zoth Village
+    subarea: Zoth Village
+    x: -53
+    y: 18

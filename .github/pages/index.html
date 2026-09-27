@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dofus Travel Helper</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <h1>Dofus Travel Helper</h1>
+    <p class="subtitle">Same logic as <code>travel.ahk</code>: enter coordinates, get the closest zaap and a ready-to-paste command.</p>
+
+    <label for="coordsInput">Coordinates</label>
+    <input
+      id="coordsInput"
+      type="text"
+      placeholder="e.g. 12 24, 12,24, /travel 12 24"
+      autocomplete="off"
+    />
+
+    <div class="row">
+      <button id="generateBtn">Generate</button>
+      <label class="checkbox">
+        <input type="checkbox" id="autoCopy" checked />
+        Copy to clipboard automatically
+      </label>
+    </div>
+
+    <div id="error" class="error"></div>
+
+    <label for="output">Command</label>
+    <input id="output" type="text" readonly />
+    <div id="via" class="via"></div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
