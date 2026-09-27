@@ -1,6 +1,7 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Force
 #Include <OCR>
+#Include utils.ahk
 
 ;; CONFIGURATION
 
@@ -11,12 +12,12 @@ priceAccumulateDebugShortcut := "^+u"
 
 ;; IMPLEMENTATION
 
-#HotIf WinActive("ahk_exe Dofus.exe")
+HotIf(IsDofusActive)
 Hotkey(recipePriceShortcut, RecipePriceHandler)
 Hotkey(recipePriceDebugShortcut, RecipePriceDebugHandler)
 Hotkey(priceAccumulateShortcut, PriceAccumulateHandler)
 Hotkey(priceAccumulateDebugShortcut, PriceAccumulateDebugHandler)
-#HotIf
+HotIf()
 
 prices := []
 
@@ -81,13 +82,17 @@ RecipeTotalPrice(debug := false)
 
 ;; UTILITIES
 
-ParseMaxPrice(ocr_res, debug := false) {
+ParseMaxPrice(ocr_res, debug := false)
+{
     res := -1
-    if debug {
+    if debug
+    {
         MsgBox "OCR Result: " ocr_res.text
     }
-    for line in ocr_res.Lines {
-        if debug {
+    for line in ocr_res.Lines
+    {
+        if debug
+        {
             MsgBox "Line text: " line.Text
         }
         if RegExMatch(line.Text, "[0-9]+(?:\s+[0-9O]+)*", &m)
@@ -97,7 +102,8 @@ ParseMaxPrice(ocr_res, debug := false) {
             res := Max(res, number)
         }
     }
-    if debug {
+    if debug
+    {
         MsgBox "Max price found: " FormatThousands(res)
     }
     return res
@@ -112,7 +118,8 @@ FindPriceNew(debug := false)
     ; Look around PRIX MOYEN
     ; Iterate over all lines for the highest number
     search_area := {x: startX - 400, y: startY + 100, w: 800, h: 150}
-    if debug {
+    if debug
+    {
         rect := DrawRectangle(search_area.x, search_area.y, search_area.w, search_area.h, "Green", 2)
         Sleep 500
         DestroyRectangle(rect)
@@ -125,8 +132,10 @@ FindPriceNew(debug := false)
         result.Highlight(500)
     text := ""
     found := false
-    for line in result.Lines {
-        if InStr(line.Text, "PRIX MOYEN") {
+    for line in result.Lines
+    {
+        if InStr(line.Text, "PRIX MOYEN")
+        {
             found := true
             surrounding := {
                 x: line.x - 2, y: line.y - 2,
@@ -137,7 +146,8 @@ FindPriceNew(debug := false)
     if not found
         return -1
 
-    if debug {
+    if debug
+    {
         rect := DrawRectangle(surrounding.x, surrounding.y, surrounding.w, surrounding.h, "Red", 2)
         Sleep 500
         DestroyRectangle(rect)
@@ -153,7 +163,8 @@ FindPriceNew(debug := false)
     return ParseMaxPrice(price_res, debug)
 }
 
-FormatThousands(n) {
+FormatThousands(n)
+{
     return RegExReplace(String(n), "\B(?=(\d{3})+(?!\d))", " ")
 }
 
