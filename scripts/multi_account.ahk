@@ -8,14 +8,6 @@ switchWindowShortcut := "F5"
 switchAndClickShortcut := "F6" ; like switchWindowShortcut, but also clicks at the current mouse position once the next window is active
 
 macroShortcut := "F7"
-macroReplayDelay := 250 ; Fixed delay (ms) inserted between replayed clicks, replacing whatever real gaps were recorded
-
-mouseButtons := Map(
-    "LButton", "Left",
-    "RButton", "Right",
-    "MButton", "Middle"
-)
-
 ; Switches to the first active Dofus window whose character name matches one
 ; of the given names for that shortcut. Does nothing if none of them are open.
 characterShortcuts := Map(
@@ -24,6 +16,14 @@ characterShortcuts := Map(
 )
 
 ;; IMPLEMENTATION
+
+macroReplayDelay := 250 ; Fixed delay (ms) inserted between replayed clicks, replacing whatever real gaps were recorded
+
+mouseButtons := Map(
+    "LButton", "Left",
+    "RButton", "Right",
+    "MButton", "Middle"
+)
 
 recording := false
 recordingHwnd := 0

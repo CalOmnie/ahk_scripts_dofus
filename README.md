@@ -6,7 +6,7 @@ Plusieurs de ces scripts automatisent des actions dans le jeu (lecture des fenê
 
 ## Prérequis
 - [AutoHotkey v2](https://www.autohotkey.com/)
-- [Bibliothèque OCR](https://github.com/Descolada/OCR) (à installer dans le dossier `Autohotkey/Lib`, nécessaire uniquement pour `recipe_price.ahk`)
+- [Bibliothèque OCR](https://github.com/Descolada/OCR) (à installer dans le dossier `Autohotkey/Lib`, nécessaire uniquement pour `recipe_price.ahk`). Pour plus d'information regardez sur la documentation officielle [ici](https://www.autohotkey.com/docs/v2/Scripts.htm#lib)
 
 ## Installation
 - Clonez le dépôt, téléchargez les scripts individuellement, ou copiez-collez directement les fonctions dont vous avez besoin dans un fichier `.ahk`
