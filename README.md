@@ -111,5 +111,26 @@ Des lieux nommés peuvent être définis dans `namedLocations` (section CONFIGUR
 | `Ctrl+Maj+P` | Identique à `Ctrl+P`, mais affiche les étapes de détection (mode debug) |
 | `Ctrl+U` | Ajoute un prix détecté à un cumul manuel ; repasser sans détection affiche le total et le réinitialise |
 | `Ctrl+Maj+U` | Détecte un seul prix, en mode debug |
+| `Ctrl+Maj+R` | Assistant de calibration en 3 étapes (voir ci-dessous) |
 
 ⚠️ **`Ctrl+P` déplace la souris et enchaîne plusieurs lectures automatiques sans intervention manuelle entre chaque ingrédient.**
+
+### Fichier de support : `ocr_utils.ahk`
+
+`recipe_price.ahk` s'appuie sur `ocr_utils.ahk` pour tout ce qui touche à l'OCR : c'est un fichier de support inclus par `recipe_price.ahk` (comme `utils.ahk`), pas un script à lancer seul. Il regroupe deux choses :
+
+- La détection de la ligne "PRIX MOYEN" à l'écran (`FindPrixMoyenLine` / `FindPrixMoyenLineInRect`), utilisée par `recipe_price.ahk` à chaque lecture de prix.
+- L'assistant de calibration déclenché par `Ctrl+Maj+R` (`CalibrateRecipeSetup`), décrit ci-dessous, qui mesure les 3 valeurs dont `recipe_price.ahk` a besoin en vous faisant dessiner des rectangles à la souris plutôt que de les régler à la main.
+
+Vous n'avez normalement jamais besoin d'ouvrir ce fichier : passez par `Ctrl+Maj+R` dans `recipe_price.ahk`.
+
+### Calibration (`Ctrl+Maj+R`)
+
+Les valeurs `ingredientStepPx`, `searchAreaOffset` et `priceAreaPadding` (section CONFIGURATION de `recipe_price.ahk`, clairement isolées et commentées) dépendent de la résolution d'écran et de la taille de la fenêtre Dofus. Plutôt que de les régler à la main, `Ctrl+Maj+R` lance un assistant en 4 étapes, chacune illustrée par une image de référence (dossier `data/`) :
+
+1. Dessinez un rectangle englobant les 2 premiers ingrédients de la recette, pour mesurer l'espacement entre eux (`ingredientStepPx`, la moitié de la largeur du rectangle).
+2. Positionnez la souris comme pour vérifier un prix normalement (infobulle ouverte, `Alt` pour la verrouiller), puis cliquez pour enregistrer cette position de référence. Cette étape ne bloque pas les clics vers Dofus, pour que l'infobulle du jeu s'affiche normalement.
+3. Dessinez un rectangle couvrant toute la zone où l'infobulle de prix apparaît (`searchAreaOffset`, mesuré par rapport à la position enregistrée à l'étape précédente).
+4. Dessinez un rectangle autour de l'endroit où le prix moyen doit être lu (`priceAreaPadding`, calculé par rapport à la position de "PRIX MOYEN" détectée par OCR).
+
+Les étapes 1, 3 et 4 se font sur une surface transparente qui recouvre tout l'écran, pour que le clic-glissé ne soit jamais transmis au jeu en dessous. `Échap` annule l'étape en cours. Les nouvelles valeurs s'appliquent immédiatement pour la session en cours ; à la fin, une zone de texte **sélectionnable** affiche les 3 lignes à copier dans la section CONFIGURATION de `recipe_price.ahk` pour les rendre permanentes.

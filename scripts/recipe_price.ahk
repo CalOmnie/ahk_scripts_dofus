@@ -2,6 +2,7 @@
 #SingleInstance Force
 #Include <OCR>
 #Include utils.ahk
+#Include ocr_utils.ahk
 
 ;; CONFIGURATION
 
@@ -9,6 +10,20 @@ recipePriceShortcut := "^p"
 recipePriceDebugShortcut := "^+p"
 priceAccumulateShortcut := "^u"
 priceAccumulateDebugShortcut := "^+u"
+
+ocrOptions := {grayscale: true, scale: 3, lang: "fr"}
+ingredientMoveDelayMs := 150
+debugHighlightDelayMs := 500
+
+; ==============================================================================
+; Valeurs calibrées pour VOTRE résolution d'écran et taille de fenêtre Dofus.
+; Ne les modifiez pas à la main : appuyez sur Ctrl+Maj+R (assistant de
+; calibration, voir ocr_utils.ahk et le README) et copiez les 3 lignes
+; affichées à la fin ici.
+ingredientStepPx := 45
+searchAreaOffset := {x: -453, y: 57, w: 805, h: 225}
+priceAreaPadding := {x: -11, y: -14, w: 153, h: 72}
+; ==============================================================================
 
 ;; IMPLEMENTATION
 
@@ -34,12 +49,12 @@ RecipePriceDebugHandler(*)
 PriceAccumulateHandler(*)
 {
     global prices
-    num := FindPriceNew(false)
-    if num < 0 {
+    num := FindPrice(false)
+    if num < 0
+    {
         total := 0
-        for p in prices {
+        for p in prices
             total += p
-        }
         MsgBox "Price found : " FormatThousands(total)
         prices := []
     }
@@ -49,118 +64,82 @@ PriceAccumulateHandler(*)
 
 PriceAccumulateDebugHandler(*)
 {
-    FindPriceNew(true)
+    FindPrice(true)
 }
 
 RecipeTotalPrice(debug := false)
 {
-    ; Move in 45 px steps
-    step := 45
+    global ingredientStepPx, ingredientMoveDelayMs
 
     CoordMode "Mouse"
     MouseGetPos(&startX, &y)
-    full_price := 0
+
+    totalPrice := 0
     Loop
     {
-        price := FindPriceNew(debug)
+        price := FindPrice(debug)
         if price < 0
             break
 
-        full_price += price
+        totalPrice += price
 
-        SendMode "Event"
-        CoordMode "Mouse"
-        x := startX + A_Index * step
+        x := startX + A_Index * ingredientStepPx
         MouseMove x, y, 2
-
-        Sleep 75
-
+        Sleep ingredientMoveDelayMs
     }
-    A_Clipboard := full_price
-    MsgBox FormatThousands(full_price)
+
+    A_Clipboard := totalPrice
+    MsgBox FormatThousands(totalPrice)
 }
 
 ;; UTILITIES
 
-ParseMaxPrice(ocr_res, debug := false)
+ParseMaxPrice(ocrResult, debug := false)
 {
-    res := -1
+    best := -1
     if debug
-    {
-        MsgBox "OCR Result: " ocr_res.text
-    }
-    for line in ocr_res.Lines
+        MsgBox "OCR Result: " ocrResult.text
+
+    for line in ocrResult.Lines
     {
         if debug
-        {
             MsgBox "Line text: " line.Text
-        }
+
         if RegExMatch(line.Text, "[0-9]+(?:\s+[0-9O]+)*", &m)
         {
-            numberText := StrReplace(m[0], "O", "0")
-            number := Integer(StrReplace(numberText, " "))
-            res := Max(res, number)
+            priceText := StrReplace(StrReplace(m[0], "O", "0"), " ")
+            best := Max(best, Integer(priceText))
         }
     }
+
     if debug
-    {
-        MsgBox "Max price found: " FormatThousands(res)
-    }
-    return res
+        MsgBox "Max price found: " FormatThousands(best)
+
+    return best
 }
 
-FindPriceNew(debug := false)
+FindPrice(debug := false)
 {
-    CoordMode "Mouse"
-    MouseGetPos(&startX, &startY)
-    ; Look around both ides of mouse position
-    ; Locate PRIX MOYEN
-    ; Look around PRIX MOYEN
-    ; Iterate over all lines for the highest number
-    search_area := {x: startX - 400, y: startY + 100, w: 800, h: 150}
-    if debug
-    {
-        rect := DrawRectangle(search_area.x, search_area.y, search_area.w, search_area.h, "Green", 2)
-        Sleep 500
-        DestroyRectangle(rect)
-    }
-    result := OCR.FromRect(
-        search_area.x, search_area.y, search_area.w, search_area.h,
-        {grayscale: true, scale: 3, lang: "fr"}
-    )
-    if debug
-        result.Highlight(500)
-    text := ""
-    found := false
-    for line in result.Lines
-    {
-        if InStr(line.Text, "PRIX MOYEN")
-        {
-            found := true
-            surrounding := {
-                x: line.x - 2, y: line.y - 2,
-                w: line.w + 100, h: line.h + 30
-            }
-        }
-    }
-    if not found
+    global searchAreaOffset, priceAreaPadding, ocrOptions, debugHighlightDelayMs
+
+    line := FindPrixMoyenLine(searchAreaOffset, debug)
+    if !IsObject(line)
         return -1
 
-    if debug
-    {
-        rect := DrawRectangle(surrounding.x, surrounding.y, surrounding.w, surrounding.h, "Red", 2)
-        Sleep 500
-        DestroyRectangle(rect)
+    priceArea := {
+        x: line.x + priceAreaPadding.x,
+        y: line.y + priceAreaPadding.y,
+        w: line.w + priceAreaPadding.w,
+        h: line.h + priceAreaPadding.h
     }
-    price_res := OCR.FromRect(
-        surrounding.x, surrounding.y, surrounding.w, surrounding.h,
-        {grayscale: true, scale: 3, lang: "fr"}
-    )
-    text := price_res.text
     if debug
-        price_res.Highlight(500)
+        FlashRectangle(priceArea, "Red")
 
-    return ParseMaxPrice(price_res, debug)
+    priceResult := OCR.FromRect(priceArea.x, priceArea.y, priceArea.w, priceArea.h, ocrOptions)
+    if debug
+        priceResult.Highlight(debugHighlightDelayMs)
+
+    return ParseMaxPrice(priceResult, debug)
 }
 
 FormatThousands(n)
@@ -168,33 +147,10 @@ FormatThousands(n)
     return RegExReplace(String(n), "\B(?=(\d{3})+(?!\d))", " ")
 }
 
-DrawRectangle(x, y, w, h, color := "Red", thickness := 2)
+FlashRectangle(area, color)
 {
-    rect := {}
-
-    rect.top := Gui("-Caption +AlwaysOnTop +ToolWindow")
-    rect.bottom := Gui("-Caption +AlwaysOnTop +ToolWindow")
-    rect.left := Gui("-Caption +AlwaysOnTop +ToolWindow")
-    rect.right := Gui("-Caption +AlwaysOnTop +ToolWindow")
-
-    for g in [rect.top, rect.bottom, rect.left, rect.right]
-    {
-        g.BackColor := color
-        g.Show("NA")
-    }
-
-    rect.top.Move(x, y, w, thickness)
-    rect.bottom.Move(x, y + h - thickness, w, thickness)
-    rect.left.Move(x, y, thickness, h)
-    rect.right.Move(x + w - thickness, y, thickness, h)
-
-    return rect
-}
-
-DestroyRectangle(rect)
-{
-    rect.top.Destroy()
-    rect.bottom.Destroy()
-    rect.left.Destroy()
-    rect.right.Destroy()
+    global debugHighlightDelayMs
+    rect := DrawRectangle(area.x, area.y, area.w, area.h, color, 2)
+    Sleep debugHighlightDelayMs
+    DestroyRectangle(rect)
 }

@@ -97,3 +97,94 @@ BuildTravelCommand(coords)
     closest := ClosestZaap(coords.x, coords.y, zaaps)
     return "/zaap " closest.x " " closest.y "; /travel " coords.x " " coords.y
 }
+
+; -DPIScale disables AHK's own automatic scaling of Gui coordinates on
+; high-DPI displays, so they line up directly with the plain (unscaled)
+; screen coordinates MouseGetPos and SysGet return
+DrawRectangle(x, y, w, h, color := "Red", thickness := 2)
+{
+    ; If the box is smaller than its own border thickness, y + h - thickness
+    ; (and the x equivalent) go negative relative to the corner, pushing the
+    ; bottom/right borders above/left of (x, y) instead of around the box
+    w := Max(w, thickness)
+    h := Max(h, thickness)
+
+    rect := {}
+
+    rect.top := Gui("-Caption +AlwaysOnTop +ToolWindow -DPIScale")
+    rect.bottom := Gui("-Caption +AlwaysOnTop +ToolWindow -DPIScale")
+    rect.left := Gui("-Caption +AlwaysOnTop +ToolWindow -DPIScale")
+    rect.right := Gui("-Caption +AlwaysOnTop +ToolWindow -DPIScale")
+
+    for g in [rect.top, rect.bottom, rect.left, rect.right]
+    {
+        g.BackColor := color
+        g.Show("NA")
+    }
+
+    rect.top.Move(x, y, w, thickness)
+    rect.bottom.Move(x, y + h - thickness, w, thickness)
+    rect.left.Move(x, y, thickness, h)
+    rect.right.Move(x + w - thickness, y, thickness, h)
+
+    return rect
+}
+
+DestroyRectangle(rect)
+{
+    rect.top.Destroy()
+    rect.bottom.Destroy()
+    rect.left.Destroy()
+    rect.right.Destroy()
+}
+
+; Shows instructions like MsgBox, but with one or more images stacked above
+; the OK button (MsgBox itself only supports built-in system icons, not
+; arbitrary image files). imagePaths can be omitted/"", a single path, or an
+; array of paths. Missing files are skipped. Falls back to a plain MsgBox if
+; no image ends up available. Blocks until the user closes it, same as MsgBox.
+ShowInstructions(text, imagePaths := "")
+{
+    paths := (imagePaths = "") ? [] : (imagePaths is Array) ? imagePaths : [imagePaths]
+
+    existingPaths := []
+    for path in paths
+        if FileExist(path)
+            existingPaths.Push(path)
+
+    if existingPaths.Length = 0
+    {
+        MsgBox text
+        return
+    }
+
+    ; Sized relative to the screen (capped) instead of a fixed pixel width, so
+    ; the dialog and image stay a sensible size on both small and large/high-
+    ; DPI displays
+    width := Min(700, Round(A_ScreenWidth * 0.4))
+
+    g := Gui("+AlwaysOnTop", "Instructions")
+    g.SetFont("s10")
+    g.AddText("w" width, text)
+    for path in existingPaths
+        g.AddPicture("w" width, path)
+    g.AddButton("w100 Default", "OK").OnEvent("Click", (*) => g.Destroy())
+    g.OnEvent("Close", (*) => g.Destroy())
+    g.Show()
+    WinWaitClose("ahk_id " g.Hwnd)
+}
+
+; Shows text in a read-only, selectable/copyable Edit box instead of a MsgBox
+; (MsgBox text can't be selected). Text arrives pre-selected so Ctrl+C alone
+; copies everything.
+ShowSelectableText(text, title := "Résultat")
+{
+    resultGui := Gui("+AlwaysOnTop", title)
+    resultGui.SetFont("s10", "Consolas")
+    edit := resultGui.AddEdit("w500 r10 ReadOnly -Wrap +HScroll", text)
+    resultGui.AddButton("w100 Default", "OK").OnEvent("Click", (*) => resultGui.Destroy())
+    resultGui.OnEvent("Close", (*) => resultGui.Destroy())
+    resultGui.Show()
+    edit.Focus()
+    SendMessage(0xB1, 0, -1, edit.Hwnd) ; EM_SETSEL, select all
+}
