@@ -1,86 +1,146 @@
 #Requires AutoHotkey v2.0
+#SingleInstance Force
 #Include utils.ahk
 
 ;; CONFIGURATION
 
 travelShortcut := "^y"
+broadcastTravelShortcut := "^+y" ; same as travelShortcut, but sends the command to every active Dofus window
+broadcastClipboardShortcut := "^+c" ; no prompt: just sends whatever's currently in the clipboard to every active Dofus window
+clipboardShortcut := "^+v" ; same as broadcastClipboardShortcut, but only sends it to the active window
+
+; Named locations that bypass coordinate parsing entirely.
+; "shortcut" is optional: leave it "" to skip creating a dedicated hotkey
+; that travels straight there, e.g. "bank" -> travel to 10,22 via Ctrl+Shift+B
+namedLocations := Map(
+    "dim", {coords: [-22, -24], shortcut: "^F1"}
+)
 
 ;; IMPLEMENTATION
 
-#HotIf WinActive("ahk_exe Dofus.exe")
+HotIf(IsDofusActive)
 Hotkey(travelShortcut, TravelPrompt)
-#HotIf
+Hotkey(broadcastTravelShortcut, BroadcastTravelPrompt)
+Hotkey(broadcastClipboardShortcut, BroadcastClipboard)
+Hotkey(clipboardShortcut, SendClipboard)
+
+for name, entry in namedLocations
+    if entry.shortcut != ""
+        Hotkey(entry.shortcut, MakeLocationHandler(entry))
+HotIf()
 
 TravelPrompt(*)
 {
-    ib := InputBox("Enter coordinates (e.g. 12 24, 12,24, /travel 12 24)", "Travel")
-    if ib.Result = "Cancel"
+    coords := PromptForCoordinates("Travel")
+    if !IsObject(coords)
         return
 
-    coords := ParseCoordinates(ib.Value)
+    TravelTo(coords)
+}
+
+; Same coordinate prompt as TravelPrompt, but sends the resulting command to
+; every active Dofus window instead of just the one it was triggered from
+BroadcastTravelPrompt(*)
+{
+    coords := PromptForCoordinates("Travel (all windows)")
+    if !IsObject(coords)
+        return
+
+    if !PrepareTravelCommand(coords)
+        return
+
+    BroadcastToAllWindows()
+}
+
+; Prompts for coordinates or a saved location name, showing an error and
+; returning false if the user cancelled or the input couldn't be resolved
+PromptForCoordinates(title)
+{
+    ib := InputBox("Enter coordinates (e.g. 12 24, 12,24, /travel 12 24) or a saved location name", title)
+    if ib.Result = "Cancel"
+        return false
+
+    coords := ResolveCoordinates(ib.Value)
     if !IsObject(coords)
     {
         MsgBox "Could not parse coordinates from: " ib.Value
-        return
+        return false
     }
 
-    zaaps := LoadZaaps()
-    if zaaps.Length = 0
+    return coords
+}
+
+; No prompt, no coordinate resolution -- just fans out whatever's currently
+; in the clipboard, e.g. a command already built by TravelPrompt or
+; BroadcastTravelPrompt on another window
+BroadcastClipboard(*)
+{
+    BroadcastToAllWindows()
+}
+
+; Same idea, but only sends the clipboard to the currently active window
+SendClipboard(*)
+{
+    SendChatCommand()
+}
+
+BroadcastToAllWindows()
+{
+    sourceHwnd := WinGetID("A")
+    for hwnd in WinGetList("ahk_exe Dofus.exe")
+    {
+        if !ActivateWindow(hwnd)
+            continue
+
+        SendChatCommand()
+    }
+    WinActivate(sourceHwnd)
+}
+
+; Returns a hotkey handler bound to this specific location. Wrapping the
+; closure in its own function call gives each one its own copy of `entry`
+; -- capturing the for-loop's variable directly would have every handler
+; end up pointing at whichever location was last in the map.
+MakeLocationHandler(entry)
+{
+    return (*) => TravelTo({x: entry.coords[1], y: entry.coords[2]})
+}
+
+TravelTo(coords)
+{
+    if !PrepareTravelCommand(coords)
+        return
+
+    SendChatCommand()
+}
+
+; Builds the travel command for {x, y} and copies it to the clipboard,
+; showing an error and returning false if no zaap data could be loaded
+PrepareTravelCommand(coords)
+{
+    result := BuildTravelCommand(coords)
+    if result = ""
     {
         MsgBox "No zaaps found in data\zaaps.yaml"
-        return
+        return false
     }
 
-    closest := ClosestZaap(coords.x, coords.y, zaaps)
-
-    result := "/zaap " closest.x " " closest.y "; /travel " coords.x " " coords.y
     A_Clipboard := result
-    SendChatCommand()
+    return true
 }
 
 ;; UTILITIES
 
-ParseCoordinates(input)
+ResolveCoordinates(input)
 {
-    text := Trim(input)
-    text := RegExReplace(text, "i)^/travel\s*", "")
-    text := Trim(text)
+    global namedLocations
 
-    if !RegExMatch(text, "^(-?\d+)\s*,?\s*(-?\d+)$", &m)
-        return false
-
-    return {x: Integer(m[1]), y: Integer(m[2])}
-}
-
-LoadZaaps()
-{
-    zaaps := []
-    path := A_ScriptDir "\..\data\zaaps.yaml"
-    if !FileExist(path)
-        return zaaps
-
-    content := FileRead(path)
-    pos := 1
-    while RegExMatch(content, "area:\s*(.*?)\R\s*subarea:\s*(.*?)\R\s*x:\s*(-?\d+)\R\s*y:\s*(-?\d+)", &m, pos)
+    key := StrLower(Trim(input))
+    if namedLocations.Has(key)
     {
-        zaaps.Push({area: Trim(m[1]), subarea: Trim(m[2]), x: Integer(m[3]), y: Integer(m[4])})
-        pos := m.Pos(0) + m.Len(0)
+        loc := namedLocations[key].coords
+        return {x: loc[1], y: loc[2]}
     }
-    return zaaps
-}
 
-ClosestZaap(x, y, zaaps)
-{
-    best := zaaps[1]
-    bestDist := (best.x - x) ** 2 + (best.y - y) ** 2
-    for z in zaaps
-    {
-        d := (z.x - x) ** 2 + (z.y - y) ** 2
-        if d < bestDist
-        {
-            bestDist := d
-            best := z
-        }
-    }
-    return best
+    return ParseCoordinates(input)
 }
