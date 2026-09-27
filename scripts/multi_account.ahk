@@ -4,15 +4,15 @@
 
 ;; CONFIGURATION
 
-switchWindowShortcut := "F5"
-switchAndClickShortcut := "F6" ; like switchWindowShortcut, but also clicks at the current mouse position once the next window is active
+switchWindowShortcut := "F2"
+switchAndClickShortcut := "F3" ; like switchWindowShortcut, but also clicks at the current mouse position once the next window is active
 
-macroShortcut := "F7"
+macroShortcut := "F4"
 ; Switches to the first active Dofus window whose character name matches one
 ; of the given names for that shortcut. Does nothing if none of them are open.
 characterShortcuts := Map(
-    "F1", ["Cal-Vioc", "Cal-Ice"],
-    "F2", ["Cal-Ori", "Cal-Siner"]
+    "F5", ["Cal-Vioc", "Cal-Ice", "Cal-eidoscope"],
+    "F6", ["Cal-Ori", "Cal-Siner"]
 )
 
 ;; IMPLEMENTATION
@@ -67,9 +67,10 @@ SwitchWindow(*)
     ActivateWindow(nextHwnd)
 }
 
-; Like SwitchWindow, but also sends a click at wherever the mouse currently
-; is once the next window is active -- e.g. for clicking the same on-screen
-; spot (a spell, the map) across every account without moving the cursor
+; Sends a click at wherever the mouse currently is on the active window,
+; then switches to the next one (like SwitchWindow) -- e.g. for clicking the
+; same on-screen spot (a spell, the map) across every account in turn
+; without moving the cursor
 SwitchWindowAndClick(*)
 {
     Click()

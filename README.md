@@ -28,6 +28,41 @@ Chaque script suit la même structure :
 
 Tous les raccourcis ne fonctionnent que lorsqu'une fenêtre Dofus est au premier plan. `utils.ahk` (voir plus bas) regroupe les fonctions partagées par les autres scripts, notamment cette vérification.
 
+## Personnaliser les raccourcis
+
+Si un raccourci par défaut ne vous convient pas, chacun est une simple variable dans la section `;; CONFIGURATION` en haut du fichier concerné, par exemple dans `travel.ahk` :
+
+```ahk
+travelShortcut := "^y"
+```
+
+Il suffit de modifier la valeur entre guillemets. Les scripts utilisent la syntaxe de touches d'AutoHotkey :
+- `^` = Ctrl
+- `+` = Maj (Shift)
+- `!` = Alt
+- `#` = touche Windows
+- Les modificateurs se combinent en les accolant, ex. `^+y` = Ctrl+Maj+Y
+
+La liste complète des noms de touches valides (touches de fonction `F1`-`F24`, flèches, pavé numérique, boutons de la souris, etc.) est disponible dans la [documentation officielle des touches AutoHotkey](https://www.autohotkey.com/docs/v2/KeyList.htm).
+
+⚠️ Deux raccourcis identiques définis dans le même script entrent en conflit : un seul des deux fonctionnera réellement, sans message d'erreur. Vérifiez qu'une touche n'est pas déjà utilisée ailleurs dans le même fichier avant de l'assigner.
+
+Après toute modification, il faut recharger le script pour qu'elle prenne effet (clic droit sur son icône dans la barre des tâches -> "Reload This Script", ou relancez-le) : AutoHotkey ne recharge pas automatiquement un fichier modifié pendant qu'il tourne.
+
+Certains scripts définissent aussi des listes (`Map`) plutôt qu'un simple raccourci, pour associer plusieurs raccourcis à des données différentes :
+- `namedLocations` dans `travel.ahk` : associe un nom de lieu à des coordonnées et, en option, un raccourci dédié qui y téléporte directement
+- `characterShortcuts` dans `multi_account.ahk` : associe un raccourci à une liste de noms de personnages
+
+Pour ajouter une entrée, copiez une ligne existante et adaptez-la, par exemple dans `multi_account.ahk` :
+
+```ahk
+characterShortcuts := Map(
+    "F5", ["Cal-Vioc", "Cal-Ice", "Cal-eidoscope"],
+    "F6", ["Cal-Ori", "Cal-Siner"],
+    "F7", ["MonNouveauPersonnage"]
+)
+```
+
 ---
 
 ## `grouping.ahk` — invitation de groupe
@@ -59,12 +94,12 @@ Des lieux nommés peuvent être définis dans `namedLocations` (section CONFIGUR
 
 | Raccourci par défaut | Action |
 |---|---|
-| `F5` | Passe à la fenêtre Dofus suivante |
-| `F6` | Passe à la fenêtre suivante puis clique à la position actuelle de la souris |
-| `F7` ⚠️ | Démarre/arrête l'enregistrement des clics sur la fenêtre active ; à l'arrêt, **rejoue automatiquement la séquence de clics enregistrée sur toutes les autres fenêtres Dofus ouvertes** |
-| Raccourcis définis dans `characterShortcuts` (ex. `F1`, `F2`) | Bascule directement vers la fenêtre du personnage correspondant si elle est ouverte, sans rien faire sinon |
+| `F2` | Passe à la fenêtre Dofus suivante |
+| `F3` | Clique à la position actuelle de la souris, puis passe à la fenêtre Dofus suivante |
+| `F4` ⚠️ | Démarre/arrête l'enregistrement des clics sur la fenêtre active ; à l'arrêt, **rejoue automatiquement la séquence de clics enregistrée sur toutes les autres fenêtres Dofus ouvertes** |
+| Raccourcis définis dans `characterShortcuts` (ex. `F5`, `F6`) | Bascule directement vers la fenêtre du personnage correspondant si elle est ouverte, sans rien faire sinon |
 
-⚠️ **`F7` automatise une séquence de clics identique sur l'ensemble de vos comptes sans intervention manuelle entre chacun — c'est l'usage le plus proche d'un bot parmi ces scripts.**
+⚠️ **`F4` automatise une séquence de clics identique sur l'ensemble de vos comptes sans intervention manuelle entre chacun — c'est l'usage le plus proche d'un bot parmi ces scripts.**
 
 ---
 
