@@ -52,8 +52,8 @@ CalibrateRecipeSetup(*)
     searchRect := DragSelectRectangle(
         "Étape 3/4 - Zone de l'infobulle`n`n"
         "Dessinez un rectangle qui couvre toute la zone où l'infobulle de prix apparaît (assez large pour englober 'PRIX MOYEN' et le prix). "
-        "Prévoyez large : l'infobulle n'apparaît pas toujours exactement au même endroit par rapport à la souris (voir les 2 exemples ci-dessous).",
-        [A_ScriptDir "\..\data\calibration_step3_1.png", A_ScriptDir "\..\data\calibration_step3_2.png"]
+        "Prévoyez large : l'infobulle n'apparaît pas toujours exactement au même endroit par rapport à la souris (voir le README pour des exemples).",
+        A_ScriptDir "\..\data\calibration_step3_3.png"
     )
     if !IsObject(searchRect)
         return
